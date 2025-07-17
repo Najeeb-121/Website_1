@@ -116,6 +116,26 @@ def set_setting(key, value):
 def load_user(user_id):
     return Admin.query.get(int(user_id))
 
+# Initialize database and create default admin
+def create_tables():
+    """Initialize database tables and create default admin if needed."""
+    try:
+        db.create_all()
+        
+        # Create default admin if none exists
+        if not Admin.query.first():
+            admin = Admin(username='admin', is_super_admin=True)
+            admin.set_password('admin121121')
+            db.session.add(admin)
+            db.session.commit()
+            print("Database initialized and default admin created")
+    except Exception as e:
+        print(f"Error initializing database: {e}")
+
+# Create tables when the app starts (not just when run directly)
+with app.app_context():
+    create_tables()
+
 # Routes
 @app.route('/')
 def index():
@@ -490,19 +510,15 @@ def admin_homepage_video_settings():
     show_homepage_video = get_setting('show_homepage_video', '1') == '1'
     return render_template('admin/homepage_video_settings.html', homepage_video_url=homepage_video_url, show_homepage_video=show_homepage_video)
 
-# Initialize database and create default admin
-def create_tables():
-    with app.app_context():
-        db.create_all()
-        
-        # Create default admin if none exists
-        if not Admin.query.first():
-            admin = Admin(username='admin', is_super_admin=True)
-            admin.set_password('admin121121')
-            db.session.add(admin)
-            db.session.commit()
+# For manual database initialization (if needed)
+@app.route('/admin/init_db')
+def init_db():
+    """Manual database initialization endpoint (for emergency use)"""
+    try:
+        create_tables()
+        return "Database initialized successfully!"
+    except Exception as e:
+        return f"Error initializing database: {e}", 500
 
 if __name__ == '__main__':
-    create_tables()
     app.run(host='0.0.0.0', port=5000, debug=True)
-
