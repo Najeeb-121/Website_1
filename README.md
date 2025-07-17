@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Made by Najeeb Alsheikh
 
 # متجر الأردن الإلكتروني - Jordan E-commerce Store
@@ -294,3 +295,6 @@ For support and questions:
 
 **Built with ❤️ for Jordan's e-commerce community**
 
+=======
+# Website_1
+>>>>>>> 29bc84376eab4365f1c4e8f778ad336a5ede6460

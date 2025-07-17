@@ -498,7 +498,7 @@ def create_tables():
         # Create default admin if none exists
         if not Admin.query.first():
             admin = Admin(username='admin', is_super_admin=True)
-            admin.set_password('admin123')
+            admin.set_password('admin121121')
             db.session.add(admin)
             db.session.commit()
 
