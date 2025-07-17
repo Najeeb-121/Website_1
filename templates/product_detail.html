@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name_ar }} - متجر الأردن الإلكتروني{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">الرئيسية</a></li>
+            <li class="breadcrumb-item active">{{ product.name_ar }}</li>
+        </ol>
+    </nav>
+    
+    <div class="row g-5">
+        <!-- Product Image -->
+        <div class="col-lg-6">
+            <div class="position-relative">
+                {% if product.discount_percentage > 0 %}
+                <div class="discount-badge">
+                    خصم {{ product.discount_percentage|int }}%
+                </div>
+                {% endif %}
+                
+                {% if product.image_url %}
+                <img src="{{ url_for('static', filename=product.image_url) }}" class="img-fluid rounded-3 shadow" alt="{{ product.name_ar }}" style="width: 100%; height: 400px; object-fit: cover;">
+                {% else %}
+                <div class="bg-light rounded-3 shadow d-flex align-items-center justify-content-center" style="height: 400px;">
+                    <i class="fas fa-image fa-4x text-muted"></i>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Additional Images Gallery -->
+            {% if product.additional_images %}
+            <div class="row g-2 mt-2">
+                {% for image in product.additional_images %}
+                <div class="col-3">
+                    <a href="{{ url_for('static', filename=image.image_url) }}" data-toggle="lightbox" data-gallery="product-gallery">
+                        <img src="{{ url_for('static', filename=image.image_url) }}" class="img-fluid rounded-3" alt="Additional product image">
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <!-- YouTube Video -->
+            {% if product.youtube_url %}
+            <div class="mt-4">
+                <h5 class="fw-bold mb-3">
+                    <i class="fab fa-youtube text-danger me-2"></i>
+                    شاهد الفيديو التوضيحي
+                </h5>
+                {% set video_id = product.youtube_url.split('v=')[-1].split('&')[0] if 'v=' in product.youtube_url else (product.youtube_url.split('/')[-1].split('?')[0] if '/' in product.youtube_url else product.youtube_url) %}
+                <a href="https://www.youtube.com/watch?v={{ video_id }}" target="_blank" rel="noopener" style="display:block;">
+                    <img src="https://img.youtube.com/vi/{{ video_id }}/hqdefault.jpg" alt="فيديو توضيحي للمنتج" class="img-fluid rounded-3 w-100" style="aspect-ratio:16/9;object-fit:cover;">
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Product Details -->
+        <div class="col-lg-6">
+            <div class="sticky-top" style="top: 100px;">
+                <h1 class="display-6 fw-bold text-primary mb-3">{{ product.name_ar }}</h1>
+                
+                {% if product.name_en %}
+                <h2 class="h4 text-muted mb-4">{{ product.name_en }}</h2>
+                {% endif %}
+                
+                <!-- Price -->
+                <div class="mb-4">
+                    {% if product.price %}
+                        {% if product.discount_percentage > 0 %}
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <span class="price-original h5">{{ "%.2f"|format(product.price) }} دينار</span>
+                            <span class="badge bg-danger">خصم {{ product.discount_percentage|int }}%</span>
+                        </div>
+                        <div class="price-discounted display-6 fw-bold">{{ "%.2f"|format(product.discounted_price) }} دينار</div>
+                        {% else %}
+                        <div class="display-6 fw-bold text-primary">{{ "%.2f"|format(product.price) }} دينار</div>
+                        {% endif %}
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>للاستفسار عن السعر، يرجى التواصل معنا</strong>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Description -->
+                <div class="mb-4">
+                    <h5 class="fw-bold mb-3">وصف المنتج</h5>
+                    <p class="text-muted lh-lg">{{ product.description_ar }}</p>
+                    
+                    {% if product.description_en %}
+                    <p class="text-muted lh-lg mt-3"><em>{{ product.description_en }}</em></p>
+                    {% endif %}
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="d-grid gap-3">
+                    {% if product.price %}
+                    <button onclick="addToCart({{ product.id }})" class="btn btn-success btn-lg">
+                        <i class="fas fa-cart-plus me-2"></i>
+                        أضف إلى السلة
+                    </button>
+                    {% endif %}
+                    
+                    <a href="https://wa.me/962791301413?text=أريد الاستفسار عن {{ product.name_ar }}" 
+                       class="whatsapp-btn btn-lg text-center text-decoration-none">
+                        <i class="fab fa-whatsapp me-2"></i>
+                        {% if product.price %}تواصل عبر واتساب{% else %}اعرف السعر{% endif %}
+                    </a>
+                    
+                    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-lg">
+                        <i class="fas fa-arrow-right me-2"></i>
+                        العودة للمنتجات
+                    </a>
+                </div>
+                
+                <!-- Product Info -->
+                <div class="mt-4 p-3 bg-light rounded-3">
+                    <h6 class="fw-bold mb-3">معلومات إضافية</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="fas fa-shipping-fast text-primary me-2"></i>
+                            توصيل مجاني لجميع أنحاء المملكة
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-money-bill-wave text-success me-2"></i>
+                            دفع عند الاستلام
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-undo text-info me-2"></i>
+                            إمكانية الإرجاع خلال 7 أيام
+                        </li>
+                        <li>
+                            <i class="fas fa-headset text-warning me-2"></i>
+                            دعم فني على مدار الساعة
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Related Products Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h3 class="text-center fw-bold mb-5">منتجات أخرى قد تعجبك</h3>
+        <div class="text-center">
+            <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-shopping-bag me-2"></i>
+                تصفح جميع المنتجات
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    });
+</script>
+{% endblock %}
+

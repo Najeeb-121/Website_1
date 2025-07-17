@@ -1,0 +1,165 @@
+{% extends "admin/base.html" %}
+
+{% block title %}إدارة المنتجات - لوحة الإدارة{% endblock %}
+{% block page_title %}إدارة المنتجات{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2 class="fw-bold mb-0">المنتجات</h2>
+            <a href="{{ url_for('admin_add_product') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>
+                إضافة منتج جديد
+            </a>
+        </div>
+    </div>
+</div>
+
+{% if products %}
+<div class="row g-4">
+    {% for product in products %}
+    <div class="col-lg-4 col-md-6">
+        <div class="card h-100 position-relative">
+            {% if product.discount_percentage > 0 %}
+            <div class="position-absolute top-0 start-0 m-2">
+                <span class="badge bg-danger">خصم {{ product.discount_percentage|int }}%</span>
+            </div>
+            {% endif %}
+            
+            {% if not product.is_active %}
+            <div class="position-absolute top-0 end-0 m-2">
+                <span class="badge bg-secondary">غير نشط</span>
+            </div>
+            {% endif %}
+            
+            {% if product.image_url %}
+            <img src="{{ url_for('static', filename=product.image_url) }}" class="card-img-top" alt="{{ product.name_ar }}" 
+                 style="height: 200px; object-fit: cover;">
+            {% else %}
+            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                <i class="fas fa-image fa-3x text-muted"></i>
+            </div>
+            {% endif %}
+            
+            <div class="card-body d-flex flex-column">
+                <h5 class="card-title fw-bold">{{ product.name_ar }}</h5>
+                {% if product.name_en %}
+                <h6 class="card-subtitle mb-2 text-muted">{{ product.name_en }}</h6>
+                {% endif %}
+                
+                <p class="card-text text-muted flex-grow-1">
+                    {{ product.description_ar[:100] }}{% if product.description_ar|length > 100 %}...{% endif %}
+                </p>
+                
+                <div class="mb-3">
+                    {% if product.price %}
+                        {% if product.discount_percentage > 0 %}
+                        <div class="text-decoration-line-through text-muted">{{ "%.2f"|format(product.price) }} دينار</div>
+                        <div class="h5 text-success fw-bold mb-0">{{ "%.2f"|format(product.discounted_price) }} دينار</div>
+                        {% else %}
+                        <div class="h5 text-primary fw-bold mb-0">{{ "%.2f"|format(product.price) }} دينار</div>
+                        {% endif %}
+                    {% else %}
+                    <div class="h6 text-info fw-bold mb-0">اتصل للاستفسار عن السعر</div>
+                    {% endif %}
+                </div>
+                
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('admin_edit_product', product_id=product.id) }}" 
+                       class="btn btn-outline-primary btn-sm flex-fill">
+                        <i class="fas fa-edit me-1"></i>
+                        تعديل
+                    </a>
+                    
+                    <a href="{{ url_for('product_detail', product_id=product.id) }}" 
+                       target="_blank" class="btn btn-outline-info btn-sm flex-fill">
+                        <i class="fas fa-eye me-1"></i>
+                        عرض
+                    </a>
+                    
+                    <button onclick="deleteProduct({{ product.id }})" 
+                            class="btn btn-outline-danger btn-sm">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card-footer bg-transparent">
+                <small class="text-muted">
+                    <i class="fas fa-calendar me-1"></i>
+                    تم الإنشاء: {{ product.created_at.strftime('%Y-%m-%d') }}
+                </small>
+                {% if product.youtube_url %}
+                <br>
+                <small class="text-info">
+                    <i class="fab fa-youtube me-1"></i>
+                    يحتوي على فيديو
+                </small>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination would go here if needed -->
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <p class="text-muted">إجمالي المنتجات: {{ products|length }}</p>
+    </div>
+</div>
+
+{% else %}
+<!-- Empty State -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-box-open fa-4x text-muted mb-4"></i>
+                <h3 class="text-muted mb-3">لا توجد منتجات</h3>
+                <p class="text-muted mb-4">ابدأ بإضافة منتجات جديدة لمتجرك</p>
+                <a href="{{ url_for('admin_add_product') }}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus me-2"></i>
+                    إضافة أول منتج
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">تأكيد الحذف</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>هل أنت متأكد من حذف هذا المنتج؟</p>
+                <p class="text-danger"><strong>تحذير:</strong> لا يمكن التراجع عن هذا الإجراء.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                <form id="deleteForm" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">حذف</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function deleteProduct(productId) {
+        const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        const form = document.getElementById('deleteForm');
+        form.action = `/admin/products/delete/${productId}`;
+        modal.show();
+    }
+</script>
+{% endblock %}
+

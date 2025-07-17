@@ -1,0 +1,262 @@
+{% extends "admin/base.html" %}
+
+{% block title %}إضافة منتج جديد - لوحة الإدارة{% endblock %}
+{% block page_title %}إضافة منتج جديد{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-plus me-2"></i>
+                    إضافة منتج جديد
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="row g-3">
+                        <!-- Arabic Name -->
+                        <div class="col-md-6">
+                            <label for="name_ar" class="form-label fw-bold">
+                                <i class="fas fa-tag me-2"></i>
+                                اسم المنتج (عربي) *
+                            </label>
+                            <input type="text" class="form-control" id="name_ar" name="name_ar" required>
+                        </div>
+                        
+                        <!-- English Name -->
+                        <div class="col-md-6">
+                            <label for="name_en" class="form-label fw-bold">
+                                <i class="fas fa-tag me-2"></i>
+                                اسم المنتج (إنجليزي)
+                            </label>
+                            <input type="text" class="form-control" id="name_en" name="name_en">
+                        </div>
+                        
+                        <!-- Arabic Description -->
+                        <div class="col-12">
+                            <label for="description_ar" class="form-label fw-bold">
+                                <i class="fas fa-align-left me-2"></i>
+                                وصف المنتج (عربي) *
+                            </label>
+                            <textarea class="form-control" id="description_ar" name="description_ar" rows="4" required></textarea>
+                        </div>
+                        
+                        <!-- English Description -->
+                        <div class="col-12">
+                            <label for="description_en" class="form-label fw-bold">
+                                <i class="fas fa-align-left me-2"></i>
+                                وصف المنتج (إنجليزي)
+                            </label>
+                            <textarea class="form-control" id="description_en" name="description_en" rows="4"></textarea>
+                        </div>
+                        
+                        <!-- Price -->
+                        <div class="col-md-6">
+                            <label for="price" class="form-label fw-bold">
+                                <i class="fas fa-dollar-sign me-2"></i>
+                                السعر (دينار أردني)
+                            </label>
+                            <input type="number" class="form-control" id="price" name="price" step="0.01" min="0">
+                            <div class="form-text">اتركه فارغاً لإظهار "اتصل للاستفسار عن السعر"</div>
+                        </div>
+                        
+                        <!-- Discount -->
+                        <div class="col-md-6">
+                            <label for="discount_percentage" class="form-label fw-bold">
+                                <i class="fas fa-percent me-2"></i>
+                                نسبة الخصم (%)
+                            </label>
+                            <input type="number" class="form-control" id="discount_percentage" name="discount_percentage" 
+                                   min="0" max="100" value="0">
+                        </div>
+                        
+                        <!-- Image Upload -->
+                        <div class="col-12">
+                            <label for="image_file" class="form-label fw-bold">
+                                <i class="fas fa-image me-2"></i>
+                                صورة المنتج الرئيسية
+                            </label>
+                            <input type="file" class="form-control" id="image_file" name="image_file" accept="image/*">
+                            <div class="form-text">اختر صورة رئيسية للمنتج من جهازك</div>
+                            <div id="main-image-preview-container" class="mt-3" style="display: none;">
+                                <h6 class="fw-bold">معاينة الصورة الرئيسية</h6>
+                                <img id="main-image-preview" src="#" alt="Image Preview" class="img-fluid rounded" style="max-height: 200px;">
+                            </div>
+                        </div>
+                        
+                        <!-- Additional Images -->
+                        <div class="col-12">
+                            <label for="additional_images" class="form-label fw-bold">
+                                <i class="fas fa-images me-2"></i>
+                                صور إضافية للمنتج
+                            </label>
+                            <input type="file" class="form-control" id="additional_images" name="additional_images" accept="image/*" multiple>
+                            <div class="form-text">يمكنك اختيار صور متعددة لعرضها في صفحة تفاصيل المنتج</div>
+                            <div id="additional-images-preview-container" class="mt-3 row g-2">
+                                <!-- Additional image previews will be inserted here -->
+                            </div>
+                        </div>
+
+                        <!-- YouTube URL -->
+                        <div class="col-12">
+                            <label for="youtube_url" class="form-label fw-bold">
+                                <i class="fab fa-youtube me-2"></i>
+                                رابط فيديو يوتيوب
+                            </label>
+                            <input type="url" class="form-control" id="youtube_url" name="youtube_url" 
+                                   placeholder="https://www.youtube.com/watch?v=...">
+                            <div class="form-text">فيديو توضيحي للمنتج (اختياري)</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Preview Section -->
+                    <div class="row mt-4" id="preview-section" style="display: none;">
+                        <div class="col-12">
+                            <h6 class="fw-bold mb-3">معاينة المنتج</h6>
+                            <div class="card">
+                                <div id="preview-image" class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                                     style="height: 200px; display: none;">
+                                    <img id="preview-img" src="" alt="معاينة الصورة" style="max-height: 100%; max-width: 100%; object-fit: cover;">
+                                </div>
+                                <div class="card-body">
+                                    <h5 id="preview-name" class="card-title fw-bold"></h5>
+                                    <p id="preview-description" class="card-text text-muted"></p>
+                                    <div id="preview-price" class="h5 text-primary fw-bold"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Submit Buttons -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="d-flex gap-3">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-save me-2"></i>
+                                    حفظ المنتج
+                                </button>
+                                
+                                <button type="button" onclick="previewProduct()" class="btn btn-info">
+                                    <i class="fas fa-eye me-2"></i>
+                                    معاينة
+                                </button>
+                                
+                                <a href="{{ url_for('admin_products') }}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-right me-2"></i>
+                                    إلغاء
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Tips Card -->
+        <div class="card mt-4">
+            <div class="card-header bg-info text-white">
+                <h6 class="mb-0">
+                    <i class="fas fa-lightbulb me-2"></i>
+                    نصائح مفيدة
+                </h6>
+            </div>
+            <div class="card-body">
+                <ul class="mb-0">
+                    <li>استخدم أسماء وصفية واضحة للمنتجات</li>
+                    <li>اكتب وصفاً مفصلاً يساعد العملاء على فهم المنتج</li>
+                    <li>استخدم صوراً عالية الجودة وواضحة</li>
+                    <li>إذا لم تحدد سعراً، سيظهر للعملاء "اتصل للاستفسار عن السعر"</li>
+                    <li>يمكنك إضافة فيديو توضيحي من يوتيوب لشرح المنتج</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function previewProduct() {
+        const nameAr = document.getElementById('name_ar').value;
+        const descriptionAr = document.getElementById('description_ar').value;
+        const price = document.getElementById('price').value;
+        const discount = document.getElementById('discount_percentage').value;
+        
+        if (!nameAr || !descriptionAr) {
+            alert('يرجى ملء الاسم والوصف على الأقل للمعاينة');
+            return;
+        }
+        
+        // Show preview section
+        document.getElementById('preview-section').style.display = 'block';
+        
+        // Update preview content
+        document.getElementById('preview-name').textContent = nameAr;
+        document.getElementById('preview-description').textContent = descriptionAr;
+        
+        // Handle price display
+        const priceElement = document.getElementById('preview-price');
+        if (price) {
+            const finalPrice = discount > 0 ? (price * (1 - discount / 100)) : price;
+            if (discount > 0) {
+                priceElement.innerHTML = `
+                    <span class="text-decoration-line-through text-muted">${parseFloat(price).toFixed(2)} دينار</span><br>
+                    <span class="text-success">${finalPrice.toFixed(2)} دينار</span>
+                `;
+            } else {
+                priceElement.textContent = `${parseFloat(price).toFixed(2)} دينار`;
+            }
+        } else {
+            priceElement.innerHTML = '<span class="text-info">اتصل للاستفسار عن السعر</span>';
+        }
+        
+        // Scroll to preview
+        document.getElementById('preview-section').scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    // Auto-preview on input change
+    document.addEventListener('DOMContentLoaded', function() {
+        const inputs = ['name_ar', 'description_ar', 'price', 'discount_percentage', 'youtube_url'];
+        inputs.forEach(id => {
+            document.getElementById(id).addEventListener('input', function() {
+                if (document.getElementById('preview-section').style.display !== 'none') {
+                    previewProduct();
+                }
+            });
+        });
+
+        // Main image preview
+        document.getElementById('image_file').addEventListener('change', function(event) {
+            const [file] = event.target.files;
+            if (file) {
+                document.getElementById('main-image-preview').src = URL.createObjectURL(file);
+                document.getElementById('main-image-preview-container').style.display = 'block';
+            } else {
+                document.getElementById('main-image-preview-container').style.display = 'none';
+            }
+        });
+
+        // Additional images preview
+        document.getElementById('additional_images').addEventListener('change', function(event) {
+            const previewContainer = document.getElementById('additional-images-preview-container');
+            previewContainer.innerHTML = ''; // Clear previous previews
+            if (event.target.files.length > 0) {
+                Array.from(event.target.files).forEach(file => {
+                    const colDiv = document.createElement('div');
+                    colDiv.classList.add('col-3');
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(file);
+                    img.classList.add('img-fluid', 'rounded');
+                    img.style.maxHeight = '100px';
+                    img.style.objectFit = 'cover';
+                    colDiv.appendChild(img);
+                    previewContainer.appendChild(colDiv);
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}
+

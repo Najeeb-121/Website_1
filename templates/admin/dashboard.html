@@ -1,0 +1,228 @@
+{% extends "admin/base.html" %}
+
+{% block title %}الرئيسية - لوحة الإدارة{% endblock %}
+{% block page_title %}الرئيسية{% endblock %}
+
+{% block content %}
+<!-- Statistics Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-3 col-md-6">
+        <div class="stats-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="fw-bold mb-1">{{ products_count }}</h3>
+                    <p class="mb-0 opacity-75">إجمالي المنتجات</p>
+                </div>
+                <i class="fas fa-box fa-2x opacity-75"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="stats-card warning">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="fw-bold mb-1">{{ orders_count }}</h3>
+                    <p class="mb-0 opacity-75">طلبات جديدة</p>
+                </div>
+                <i class="fas fa-clock fa-2x opacity-75"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="stats-card success">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="fw-bold mb-1">{{ total_orders }}</h3>
+                    <p class="mb-0 opacity-75">إجمالي الطلبات</p>
+                </div>
+                <i class="fas fa-shopping-cart fa-2x opacity-75"></i>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="stats-card info">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h3 class="fw-bold mb-1">100%</h3>
+                    <p class="mb-0 opacity-75">رضا العملاء</p>
+                </div>
+                <i class="fas fa-smile fa-2x opacity-75"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-bolt me-2"></i>
+                    إجراءات سريعة
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-lg-3 col-md-6">
+                        <a href="{{ url_for('admin_add_product') }}" class="btn btn-primary w-100">
+                            <i class="fas fa-plus me-2"></i>
+                            إضافة منتج جديد
+                        </a>
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-6">
+                        <a href="{{ url_for('admin_products') }}" class="btn btn-info w-100">
+                            <i class="fas fa-box me-2"></i>
+                            إدارة المنتجات
+                        </a>
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-6">
+                        <a href="{{ url_for('admin_orders') }}" class="btn btn-warning w-100">
+                            <i class="fas fa-shopping-cart me-2"></i>
+                            عرض الطلبات
+                        </a>
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-6">
+                        <a href="{{ url_for('index') }}" target="_blank" class="btn btn-success w-100">
+                            <i class="fas fa-external-link-alt me-2"></i>
+                            عرض الموقع
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add this after the Quick Actions or as a new card/section -->
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-video me-2"></i>
+                    إعدادات فيديو الصفحة الرئيسية
+                </h5>
+            </div>
+            <div class="card-body">
+                <a href="{{ url_for('admin_homepage_video_settings') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-cog me-2"></i>
+                    تعديل إعدادات الفيديو
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Orders -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-clock me-2"></i>
+                    الطلبات الأخيرة
+                </h5>
+                <a href="{{ url_for('admin_orders') }}" class="btn btn-outline-light btn-sm">
+                    عرض الكل
+                </a>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_orders %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>رقم الطلب</th>
+                                <th>اسم العميل</th>
+                                <th>المبلغ</th>
+                                <th>الحالة</th>
+                                <th>التاريخ</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in recent_orders %}
+                            <tr>
+                                <td>
+                                    <strong class="text-primary">#{{ order.id }}</strong>
+                                </td>
+                                <td>
+                                    <div>
+                                        <strong>{{ order.customer_name }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ order.customer_phone }}</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <strong class="text-success">{{ "%.2f"|format(order.total_amount) }} دينار</strong>
+                                </td>
+                                <td>
+                                    {% if order.status == 'pending' %}
+                                    <span class="badge bg-warning">في الانتظار</span>
+                                    {% elif order.status == 'completed' %}
+                                    <span class="badge bg-success">مكتمل</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">محذوف</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <small>{{ order.created_at.strftime('%Y-%m-%d') }}</small>
+                                    <br>
+                                    <small class="text-muted">{{ order.created_at.strftime('%H:%M') }}</small>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('admin_order_detail', order_id=order.id) }}" 
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">لا توجد طلبات حتى الآن</h5>
+                    <p class="text-muted">ستظهر الطلبات الجديدة هنا</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Welcome Message for New Admins -->
+{% if products_count == 0 %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="alert alert-info">
+            <h5 class="alert-heading">
+                <i class="fas fa-info-circle me-2"></i>
+                مرحباً بك في لوحة الإدارة!
+            </h5>
+            <p class="mb-3">لبدء استخدام المتجر، يمكنك:</p>
+            <ul class="mb-3">
+                <li>إضافة منتجات جديدة من قسم المنتجات</li>
+                <li>تخصيص أسعار المنتجات أو تركها للاستفسار</li>
+                <li>إضافة صور ومقاطع فيديو توضيحية للمنتجات</li>
+                <li>متابعة الطلبات الواردة من العملاء</li>
+            </ul>
+            <a href="{{ url_for('admin_add_product') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>
+                إضافة أول منتج
+            </a>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+

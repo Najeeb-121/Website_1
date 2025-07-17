@@ -1,0 +1,253 @@
+{% extends "admin/base.html" %}
+
+{% block title %}إضافة مدير جديد - لوحة الإدارة{% endblock %}
+{% block page_title %}إضافة مدير جديد{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-user-plus me-2"></i>
+                    إضافة مدير جديد
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="username" class="form-label fw-bold">
+                            <i class="fas fa-user me-2"></i>
+                            اسم المستخدم *
+                        </label>
+                        <input type="text" class="form-control" id="username" name="username" required>
+                        <div class="form-text">يجب أن يكون اسم المستخدم فريداً</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password" class="form-label fw-bold">
+                            <i class="fas fa-lock me-2"></i>
+                            كلمة المرور *
+                        </label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                        <div class="form-text">يجب أن تكون كلمة المرور قوية (8 أحرف على الأقل)</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="confirm_password" class="form-label fw-bold">
+                            <i class="fas fa-lock me-2"></i>
+                            تأكيد كلمة المرور *
+                        </label>
+                        <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="is_super_admin" name="is_super_admin">
+                            <label class="form-check-label fw-bold" for="is_super_admin">
+                                <i class="fas fa-crown text-warning me-2"></i>
+                                مدير رئيسي (صلاحيات كاملة)
+                            </label>
+                        </div>
+                        <div class="form-text">المديرين الرئيسيين يمكنهم إدارة المديرين الآخرين</div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save me-2"></i>
+                            إضافة المدير
+                        </button>
+                        
+                        <a href="{{ url_for('admin_admins') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-right me-2"></i>
+                            إلغاء
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Permissions Info -->
+        <div class="card mt-4">
+            <div class="card-header bg-info text-white">
+                <h6 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    معلومات الصلاحيات
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <h6 class="fw-bold text-warning">
+                            <i class="fas fa-crown me-2"></i>
+                            المدير الرئيسي
+                        </h6>
+                        <ul class="list-unstyled mb-0">
+                            <li><i class="fas fa-check text-success me-2"></i>إدارة المنتجات (إضافة، تعديل، حذف)</li>
+                            <li><i class="fas fa-check text-success me-2"></i>إدارة الطلبات (عرض، تحديث الحالة)</li>
+                            <li><i class="fas fa-check text-success me-2"></i>إدارة المديرين (إضافة، حذف)</li>
+                            <li><i class="fas fa-check text-success me-2"></i>الوصول لجميع الإحصائيات</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="col-12">
+                        <h6 class="fw-bold text-info">
+                            <i class="fas fa-user me-2"></i>
+                            المدير العادي
+                        </h6>
+                        <ul class="list-unstyled mb-0">
+                            <li><i class="fas fa-check text-success me-2"></i>إدارة المنتجات (إضافة، تعديل، حذف)</li>
+                            <li><i class="fas fa-check text-success me-2"></i>إدارة الطلبات (عرض، تحديث الحالة)</li>
+                            <li><i class="fas fa-times text-danger me-2"></i>إدارة المديرين</li>
+                            <li><i class="fas fa-check text-success me-2"></i>الوصول للإحصائيات الأساسية</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Security Tips -->
+        <div class="card mt-4">
+            <div class="card-header bg-warning text-dark">
+                <h6 class="mb-0">
+                    <i class="fas fa-shield-alt me-2"></i>
+                    نصائح الأمان
+                </h6>
+            </div>
+            <div class="card-body">
+                <ul class="mb-0">
+                    <li>استخدم أسماء مستخدمين قوية وفريدة</li>
+                    <li>اختر كلمات مرور قوية تحتوي على أحرف وأرقام ورموز</li>
+                    <li>لا تشارك معلومات تسجيل الدخول مع أي شخص</li>
+                    <li>امنح صلاحيات المدير الرئيسي للأشخاص الموثوقين فقط</li>
+                    <li>راجع قائمة المديرين بانتظام وأزل الحسابات غير المستخدمة</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Password validation
+    document.getElementById('confirm_password').addEventListener('input', function() {
+        const password = document.getElementById('password').value;
+        const confirmPassword = this.value;
+        
+        if (password !== confirmPassword) {
+            this.setCustomValidity('كلمات المرور غير متطابقة');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+    
+    // Password strength indicator
+    document.getElementById('password').addEventListener('input', function() {
+        const password = this.value;
+        const strength = getPasswordStrength(password);
+        
+        // Remove existing strength indicator
+        const existingIndicator = document.querySelector('.password-strength');
+        if (existingIndicator) {
+            existingIndicator.remove();
+        }
+        
+        // Add new strength indicator
+        const indicator = document.createElement('div');
+        indicator.className = 'password-strength mt-1';
+        
+        if (password.length > 0) {
+            let strengthText = '';
+            let strengthClass = '';
+            
+            switch (strength) {
+                case 1:
+                    strengthText = 'ضعيفة';
+                    strengthClass = 'text-danger';
+                    break;
+                case 2:
+                    strengthText = 'متوسطة';
+                    strengthClass = 'text-warning';
+                    break;
+                case 3:
+                    strengthText = 'قوية';
+                    strengthClass = 'text-success';
+                    break;
+            }
+            
+            indicator.innerHTML = `<small class="${strengthClass}">قوة كلمة المرور: ${strengthText}</small>`;
+            this.parentNode.appendChild(indicator);
+        }
+    });
+    
+    function getPasswordStrength(password) {
+        let strength = 0;
+        
+        if (password.length >= 8) strength++;
+        if (/[A-Z]/.test(password)) strength++;
+        if (/[0-9]/.test(password)) strength++;
+        if (/[^A-Za-z0-9]/.test(password)) strength++;
+        
+        return Math.min(strength, 3);
+    }
+    
+    // Username validation
+    document.getElementById('username').addEventListener('input', function() {
+        const username = this.value;
+        
+        // Remove existing validation message
+        const existingMessage = document.querySelector('.username-validation');
+        if (existingMessage) {
+            existingMessage.remove();
+        }
+        
+        if (username.length > 0) {
+            const message = document.createElement('div');
+            message.className = 'username-validation mt-1';
+            
+            if (username.length < 3) {
+                message.innerHTML = '<small class="text-danger">اسم المستخدم قصير جداً (3 أحرف على الأقل)</small>';
+            } else if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+                message.innerHTML = '<small class="text-danger">اسم المستخدم يجب أن يحتوي على أحرف وأرقام فقط</small>';
+            } else {
+                message.innerHTML = '<small class="text-success">اسم المستخدم صالح</small>';
+            }
+            
+            this.parentNode.appendChild(message);
+        }
+    });
+    
+    // Form validation
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirm_password').value;
+        const username = document.getElementById('username').value;
+        
+        if (password !== confirmPassword) {
+            e.preventDefault();
+            alert('كلمات المرور غير متطابقة');
+            return;
+        }
+        
+        if (password.length < 8) {
+            e.preventDefault();
+            alert('كلمة المرور يجب أن تكون 8 أحرف على الأقل');
+            return;
+        }
+        
+        if (username.length < 3) {
+            e.preventDefault();
+            alert('اسم المستخدم يجب أن يكون 3 أحرف على الأقل');
+            return;
+        }
+        
+        if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+            e.preventDefault();
+            alert('اسم المستخدم يجب أن يحتوي على أحرف وأرقام فقط');
+            return;
+        }
+    });
+</script>
+{% endblock %}
+

@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}تم إرسال الطلب بنجاح - متجر الأردن الإلكتروني{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Success Message -->
+            <div class="text-center mb-5">
+                <div class="mb-4">
+                    <i class="fas fa-check-circle fa-5x text-success"></i>
+                </div>
+                <h1 class="display-5 fw-bold text-success mb-3">تم إرسال طلبك بنجاح!</h1>
+                <p class="lead text-muted">شكراً لك على ثقتك بنا. سنتواصل معك قريباً لتأكيد الطلب</p>
+            </div>
+            
+            <!-- Order Details -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-receipt me-2"></i>
+                        تفاصيل الطلب #{{ order.id }}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <strong>اسم العميل:</strong>
+                            <p class="mb-0">{{ order.customer_name }}</p>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <strong>رقم الهاتف:</strong>
+                            <p class="mb-0">{{ order.customer_phone }}</p>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <strong>البريد الإلكتروني:</strong>
+                            <p class="mb-0">{{ order.customer_email }}</p>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <strong>المحافظة:</strong>
+                            <p class="mb-0">{{ order.customer_city }}</p>
+                        </div>
+                        
+                        <div class="col-12">
+                            <strong>العنوان:</strong>
+                            <p class="mb-0">{{ order.customer_location }}</p>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <strong>تاريخ الطلب:</strong>
+                            <p class="mb-0">{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <strong>المبلغ الإجمالي:</strong>
+                            <p class="mb-0 h5 text-primary fw-bold">{{ "%.2f"|format(order.total_amount) }} دينار</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Next Steps -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        الخطوات التالية
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-md-4 text-center">
+                            <i class="fas fa-phone fa-2x text-primary mb-3"></i>
+                            <h6 class="fw-bold">التأكيد</h6>
+                            <p class="small text-muted">سنتصل بك خلال 24 ساعة لتأكيد الطلب</p>
+                        </div>
+                        
+                        <div class="col-md-4 text-center">
+                            <i class="fas fa-box fa-2x text-warning mb-3"></i>
+                            <h6 class="fw-bold">التحضير</h6>
+                            <p class="small text-muted">سيتم تحضير طلبك وتجهيزه للشحن</p>
+                        </div>
+                        
+                        <div class="col-md-4 text-center">
+                            <i class="fas fa-truck fa-2x text-success mb-3"></i>
+                            <h6 class="fw-bold">التوصيل</h6>
+                            <p class="small text-muted">التوصيل خلال 2-3 أيام عمل</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact Information -->
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <h5 class="fw-bold mb-3">هل لديك استفسار؟</h5>
+                    <p class="text-muted mb-3">فريق خدمة العملاء متاح للمساعدة</p>
+                    
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <a href="https://wa.me/962791301413?text=استفسار عن الطلب رقم {{ order.id }}" 
+                           class="whatsapp-btn text-decoration-none">
+                            <i class="fab fa-whatsapp me-2"></i>
+                            واتساب
+                        </a>
+                        
+                        <a href="tel:+962791301413" class="btn btn-outline-primary">
+                            <i class="fas fa-phone me-2"></i>
+                            اتصال
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="text-center">
+                <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg me-3">
+                    <i class="fas fa-shopping-bag me-2"></i>
+                    متابعة التسوق
+                </a>
+                
+                <button onclick="window.print()" class="btn btn-outline-secondary btn-lg">
+                    <i class="fas fa-print me-2"></i>
+                    طباعة الطلب
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Print Styles -->
+<style media="print">
+    .navbar, .footer, .btn, .no-print {
+        display: none !important;
+    }
+    
+    .container {
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 20px !important;
+    }
+    
+    .card {
+        border: 1px solid #000 !important;
+        box-shadow: none !important;
+    }
+    
+    .card-header {
+        background: #f8f9fa !important;
+        color: #000 !important;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-scroll to top on page load
+    window.scrollTo(0, 0);
+    
+    // Confetti effect (optional)
+    function createConfetti() {
+        const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7'];
+        
+        for (let i = 0; i < 50; i++) {
+            const confetti = document.createElement('div');
+            confetti.style.position = 'fixed';
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.top = '-10px';
+            confetti.style.width = '10px';
+            confetti.style.height = '10px';
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.borderRadius = '50%';
+            confetti.style.pointerEvents = 'none';
+            confetti.style.zIndex = '9999';
+            confetti.style.animation = `fall ${Math.random() * 3 + 2}s linear forwards`;
+            
+            document.body.appendChild(confetti);
+            
+            setTimeout(() => {
+                confetti.remove();
+            }, 5000);
+        }
+    }
+    
+    // Add CSS for confetti animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Trigger confetti on page load
+    setTimeout(createConfetti, 500);
+</script>
+{% endblock %}
+

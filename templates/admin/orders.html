@@ -1,0 +1,275 @@
+{% extends "admin/base.html" %}
+
+{% block title %}إدارة الطلبات - لوحة الإدارة{% endblock %}
+{% block page_title %}إدارة الطلبات{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2 class="fw-bold mb-0">الطلبات</h2>
+            <div class="d-flex gap-2">
+                <select class="form-select" id="statusFilter" onchange="filterOrders()">
+                    <option value="">جميع الطلبات</option>
+                    <option value="pending">في الانتظار</option>
+                    <option value="completed">مكتملة</option>
+                    <option value="deleted">محذوفة</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Orders Statistics -->
+<div class="row g-3 mb-4">
+    <div class="col-lg-3 col-md-6">
+        <div class="card bg-warning text-dark">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="fw-bold mb-1">{{ orders|selectattr('status', 'equalto', 'pending')|list|length }}</h4>
+                        <p class="mb-0">طلبات جديدة</p>
+                    </div>
+                    <i class="fas fa-clock fa-2x opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="fw-bold mb-1">{{ orders|selectattr('status', 'equalto', 'completed')|list|length }}</h4>
+                        <p class="mb-0">طلبات مكتملة</p>
+                    </div>
+                    <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="fw-bold mb-1">{{ orders|length }}</h4>
+                        <p class="mb-0">إجمالي الطلبات</p>
+                    </div>
+                    <i class="fas fa-shopping-cart fa-2x opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="fw-bold mb-1">{{ "%.0f"|format(orders|sum(attribute='total_amount')) }}</h4>
+                        <p class="mb-0">إجمالي المبيعات (دينار)</p>
+                    </div>
+                    <i class="fas fa-dollar-sign fa-2x opacity-75"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if orders %}
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">
+            <i class="fas fa-list me-2"></i>
+            قائمة الطلبات
+        </h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>رقم الطلب</th>
+                        <th>معلومات العميل</th>
+                        <th>المبلغ</th>
+                        <th>الحالة</th>
+                        <th>التاريخ</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersTableBody">
+                    {% for order in orders %}
+                    <tr class="order-row" data-status="{{ order.status }}">
+                        <td>
+                            <strong class="text-primary">#{{ order.id }}</strong>
+                        </td>
+                        <td>
+                            <div>
+                                <strong>{{ order.customer_name }}</strong>
+                                <br>
+                                <small class="text-muted">
+                                    <i class="fas fa-phone me-1"></i>{{ order.customer_phone }}
+                                </small>
+                                <br>
+                                <small class="text-muted">
+                                    <i class="fas fa-envelope me-1"></i>{{ order.customer_email }}
+                                </small>
+                                <br>
+                                <small class="text-muted">
+                                    <i class="fas fa-map-marker-alt me-1"></i>{{ order.customer_city }}
+                                </small>
+                            </div>
+                        </td>
+                        <td>
+                            <strong class="text-success">{{ "%.2f"|format(order.total_amount) }} دينار</strong>
+                        </td>
+                        <td>
+                            {% if order.status == 'pending' %}
+                            <span class="badge bg-warning text-dark">في الانتظار</span>
+                            {% elif order.status == 'completed' %}
+                            <span class="badge bg-success">مكتمل</span>
+                            {% else %}
+                            <span class="badge bg-danger">محذوف</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div>
+                                <strong>{{ order.created_at.strftime('%Y-%m-%d') }}</strong>
+                                <br>
+                                <small class="text-muted">{{ order.created_at.strftime('%H:%M') }}</small>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a href="{{ url_for('admin_order_detail', order_id=order.id) }}" 
+                                   class="btn btn-outline-primary btn-sm" title="عرض التفاصيل">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                
+                                <a href="https://wa.me/{{ order.customer_phone.replace('+', '').replace(' ', '') }}?text=مرحباً {{ order.customer_name }}، بخصوص طلبكم رقم {{ order.id }}" 
+                                   target="_blank" class="btn btn-outline-success btn-sm" title="واتساب">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                                
+                                <a href="tel:{{ order.customer_phone }}" 
+                                   class="btn btn-outline-info btn-sm" title="اتصال">
+                                    <i class="fas fa-phone"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Pagination would go here if needed -->
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <p class="text-muted">إجمالي الطلبات: {{ orders|length }}</p>
+    </div>
+</div>
+
+{% else %}
+<!-- Empty State -->
+<div class="card">
+    <div class="card-body text-center py-5">
+        <i class="fas fa-inbox fa-4x text-muted mb-4"></i>
+        <h3 class="text-muted mb-3">لا توجد طلبات</h3>
+        <p class="text-muted mb-4">ستظهر الطلبات الجديدة هنا عندما يقوم العملاء بالطلب</p>
+        <a href="{{ url_for('index') }}" target="_blank" class="btn btn-primary">
+            <i class="fas fa-external-link-alt me-2"></i>
+            عرض الموقع
+        </a>
+    </div>
+</div>
+{% endif %}
+
+<!-- Quick Actions Modal -->
+<div class="modal fade" id="quickActionsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">إجراءات سريعة</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-success" onclick="markAllPendingAsCompleted()">
+                        <i class="fas fa-check-circle me-2"></i>
+                        تحديد جميع الطلبات المعلقة كمكتملة
+                    </button>
+                    
+                    <button class="btn btn-info" onclick="exportOrders()">
+                        <i class="fas fa-download me-2"></i>
+                        تصدير الطلبات
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Floating Action Button -->
+<div class="position-fixed bottom-0 end-0 m-4">
+    <button class="btn btn-primary rounded-circle" style="width: 60px; height: 60px;" 
+            data-bs-toggle="modal" data-bs-target="#quickActionsModal">
+        <i class="fas fa-bolt fa-lg"></i>
+    </button>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function filterOrders() {
+        const filter = document.getElementById('statusFilter').value;
+        const rows = document.querySelectorAll('.order-row');
+        
+        rows.forEach(row => {
+            const status = row.getAttribute('data-status');
+            if (filter === '' || status === filter) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+    
+    function markAllPendingAsCompleted() {
+        if (confirm('هل أنت متأكد من تحديد جميع الطلبات المعلقة كمكتملة؟')) {
+            // This would typically be an AJAX call
+            alert('سيتم تنفيذ هذه الميزة قريباً');
+        }
+    }
+    
+    function exportOrders() {
+        // This would typically generate a CSV or Excel file
+        alert('سيتم تنفيذ ميزة التصدير قريباً');
+    }
+    
+    // Auto-refresh every 30 seconds for new orders
+    setInterval(() => {
+        // This would typically check for new orders via AJAX
+        console.log('Checking for new orders...');
+    }, 30000);
+    
+    // Highlight new orders (orders from today)
+    document.addEventListener('DOMContentLoaded', function() {
+        const today = new Date().toISOString().split('T')[0];
+        const rows = document.querySelectorAll('.order-row');
+        
+        rows.forEach(row => {
+            const dateCell = row.querySelector('td:nth-child(5) strong');
+            if (dateCell && dateCell.textContent === today) {
+                row.classList.add('table-warning');
+            }
+        });
+    });
+</script>
+{% endblock %}
+

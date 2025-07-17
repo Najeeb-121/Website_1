@@ -1,0 +1,33 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}إعدادات فيديو الصفحة الرئيسية{% endblock %}
+{% block page_title %}إعدادات فيديو الصفحة الرئيسية{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-video me-2"></i>تعديل فيديو الصفحة الرئيسية</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    <div class="mb-3">
+                        <label for="homepage_video_url" class="form-label">رابط فيديو يوتيوب (رابط التضمين)</label>
+                        <input type="text" class="form-control" id="homepage_video_url" name="homepage_video_url" value="{{ homepage_video_url }}" placeholder="مثال: https://www.youtube.com/embed/VIDEO_ID">
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="show_homepage_video" name="show_homepage_video" value="1" {% if show_homepage_video %}checked{% endif %}>
+                        <label class="form-check-label" for="show_homepage_video">
+                            عرض الفيديو في الصفحة الرئيسية
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>حفظ التغييرات
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

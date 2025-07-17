@@ -1,0 +1,393 @@
+{% extends "admin/base.html" %}
+
+{% block title %}تفاصيل الطلب #{{ order.id }} - لوحة الإدارة{% endblock %}
+{% block page_title %}تفاصيل الطلب #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Order Information -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-receipt me-2"></i>
+                    معلومات الطلب
+                </h5>
+                <div>
+                    {% if order.status == 'pending' %}
+                    <span class="badge bg-warning text-dark fs-6">في الانتظار</span>
+                    {% elif order.status == 'completed' %}
+                    <span class="badge bg-success fs-6">مكتمل</span>
+                    {% else %}
+                    <span class="badge bg-danger fs-6">محذوف</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <strong>رقم الطلب:</strong>
+                        <p class="mb-0 text-primary fw-bold">#{{ order.id }}</p>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <strong>تاريخ الطلب:</strong>
+                        <p class="mb-0">{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <strong>المبلغ الإجمالي:</strong>
+                        <p class="mb-0 text-success fw-bold h5">{{ "%.2f"|format(order.total_amount) }} دينار</p>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <strong>طريقة الدفع:</strong>
+                        <p class="mb-0">
+                            <i class="fas fa-money-bill-wave text-success me-1"></i>
+                            دفع عند الاستلام
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Customer Information -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-user me-2"></i>
+                    معلومات العميل
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <strong>الاسم:</strong>
+                        <p class="mb-0">{{ order.customer_name }}</p>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <strong>رقم الهاتف:</strong>
+                        <p class="mb-0">
+                            <a href="tel:{{ order.customer_phone }}" class="text-decoration-none">
+                                <i class="fas fa-phone me-1"></i>
+                                {{ order.customer_phone }}
+                            </a>
+                        </p>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <strong>البريد الإلكتروني:</strong>
+                        <p class="mb-0">
+                            <a href="mailto:{{ order.customer_email }}" class="text-decoration-none">
+                                <i class="fas fa-envelope me-1"></i>
+                                {{ order.customer_email }}
+                            </a>
+                        </p>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <strong>المحافظة:</strong>
+                        <p class="mb-0">
+                            <i class="fas fa-map-marker-alt me-1"></i>
+                            {{ order.customer_city }}
+                        </p>
+                    </div>
+                    
+                    <div class="col-12">
+                        <strong>العنوان التفصيلي:</strong>
+                        <p class="mb-0">{{ order.customer_location }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Order Items -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-shopping-cart me-2"></i>
+                    المنتجات المطلوبة
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>المنتج</th>
+                                <th>السعر</th>
+                                <th>الكمية</th>
+                                <th>المجموع</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order_items %}
+                            <tr>
+                                <td>
+                                    <strong>{{ item.name }}</strong>
+                                </td>
+                                <td>{{ "%.2f"|format(item.price) }} دينار</td>
+                                <td>{{ item.quantity }}</td>
+                                <td><strong>{{ "%.2f"|format(item.subtotal) }} دينار</strong></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot class="table-light">
+                            <tr>
+                                <th colspan="3">المجموع الكلي:</th>
+                                <th class="text-success">{{ "%.2f"|format(order.total_amount) }} دينار</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Order Notes -->
+        {% if order.notes %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-sticky-note me-2"></i>
+                    ملاحظات الطلب
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-0">{{ order.notes }}</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="col-lg-4">
+        <!-- Quick Actions -->
+        <div class="card mb-4 sticky-top" style="top: 100px;">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-bolt me-2"></i>
+                    إجراءات سريعة
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="https://wa.me/{{ order.customer_phone.replace('+', '').replace(' ', '') }}?text=مرحباً {{ order.customer_name }}، بخصوص طلبكم رقم {{ order.id }}" 
+                       target="_blank" class="btn btn-success">
+                        <i class="fab fa-whatsapp me-2"></i>
+                        تواصل عبر واتساب
+                    </a>
+                    
+                    <a href="tel:{{ order.customer_phone }}" class="btn btn-info">
+                        <i class="fas fa-phone me-2"></i>
+                        اتصال هاتفي
+                    </a>
+                    
+                    <a href="mailto:{{ order.customer_email }}?subject=بخصوص طلبكم رقم {{ order.id }}" 
+                       class="btn btn-outline-primary">
+                        <i class="fas fa-envelope me-2"></i>
+                        إرسال إيميل
+                    </a>
+                    
+                    <button onclick="window.print()" class="btn btn-outline-secondary">
+                        <i class="fas fa-print me-2"></i>
+                        طباعة الطلب
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Update Order Status -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">
+                    <i class="fas fa-edit me-2"></i>
+                    تحديث حالة الطلب
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin_update_order_status', order_id=order.id) }}">
+                    <div class="mb-3">
+                        <label for="status" class="form-label fw-bold">الحالة الجديدة:</label>
+                        <select class="form-select" id="status" name="status" required>
+                            <option value="pending" {{ 'selected' if order.status == 'pending' }}>في الانتظار</option>
+                            <option value="completed" {{ 'selected' if order.status == 'completed' }}>مكتمل</option>
+                            <option value="deleted" {{ 'selected' if order.status == 'deleted' }}>محذوف</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="notes" class="form-label fw-bold">ملاحظات إضافية:</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="3" 
+                                  placeholder="أضف ملاحظات حول الطلب...">{{ order.notes or '' }}</textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="fas fa-save me-2"></i>
+                        حفظ التغييرات
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Order Timeline -->
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-history me-2"></i>
+                    تاريخ الطلب
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-primary"></div>
+                        <div class="timeline-content">
+                            <h6 class="fw-bold">تم إنشاء الطلب</h6>
+                            <small class="text-muted">{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                        </div>
+                    </div>
+                    
+                    {% if order.status == 'completed' %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-success"></div>
+                        <div class="timeline-content">
+                            <h6 class="fw-bold">تم إكمال الطلب</h6>
+                            <small class="text-muted">تم التحديث</small>
+                        </div>
+                    </div>
+                    {% elif order.status == 'deleted' %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-danger"></div>
+                        <div class="timeline-content">
+                            <h6 class="fw-bold">تم حذف الطلب</h6>
+                            <small class="text-muted">تم التحديث</small>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Navigation -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between">
+            <a href="{{ url_for('admin_orders') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-right me-2"></i>
+                العودة للطلبات
+            </a>
+            
+            <div class="d-flex gap-2">
+                <!-- Previous/Next order navigation could go here -->
+                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-tachometer-alt me-2"></i>
+                    الرئيسية
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Print Styles -->
+<style media="print">
+    .sidebar, .top-navbar, .btn, .card-header, .no-print {
+        display: none !important;
+    }
+    
+    .main-content {
+        margin-right: 0 !important;
+    }
+    
+    .container-fluid {
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 20px !important;
+    }
+    
+    .card {
+        border: 1px solid #000 !important;
+        box-shadow: none !important;
+        margin-bottom: 20px !important;
+    }
+    
+    .card-body {
+        padding: 15px !important;
+    }
+    
+    .table {
+        border: 1px solid #000 !important;
+    }
+    
+    .table th, .table td {
+        border: 1px solid #000 !important;
+        padding: 8px !important;
+    }
+</style>
+
+<style>
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 15px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #dee2e6;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 20px;
+    }
+    
+    .timeline-marker {
+        position: absolute;
+        left: -23px;
+        top: 5px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 2px solid white;
+    }
+    
+    .timeline-content h6 {
+        margin-bottom: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-save notes on change
+    document.getElementById('notes').addEventListener('blur', function() {
+        // This could auto-save notes via AJAX
+        console.log('Notes updated');
+    });
+    
+    // Confirm status changes
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const status = document.getElementById('status').value;
+        const currentStatus = '{{ order.status }}';
+        
+        if (status !== currentStatus) {
+            const statusNames = {
+                'pending': 'في الانتظار',
+                'completed': 'مكتمل',
+                'deleted': 'محذوف'
+            };
+            
+            if (!confirm(`هل أنت متأكد من تغيير حالة الطلب إلى "${statusNames[status]}"؟`)) {
+                e.preventDefault();
+            }
+        }
+    });
+</script>
+{% endblock %}
+
